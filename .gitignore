@@ -1,3 +1,5 @@
 # Project exclude paths
 /cmake-build-debug/
 .idea
+libs/glew-2.1.0
+libs/SFML-2.5.1
