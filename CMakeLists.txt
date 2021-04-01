@@ -12,7 +12,8 @@ set(SFML_DIR "libs/SFML-2.5.1/lib/cmake/SFML")
 #подключение файликов----------------------------------------------------------
 add_executable(TestProjectLibs test_glew_sfml.cpp)
 add_executable(TestVectorLib testing_debugging_project/tests_vector.cpp testing_debugging_project/catch.hpp libs_project/Vector.hpp)
-add_executable(TestMatrixLib testing_debugging_project/tests_matrix.cpp testing_debugging_project/catch.hpp)
+add_executable(test1 libs_project/Vector.hpp testl.cpp libs_project/Matrix.hpp)
+add_executable(TestMatrixLib testing_debugging_project/tests_matrix.cpp testing_debugging_project/catch.hpp libs_project/Matrix.hpp)
 #------------------------------------------------------------------------------
 
 #подключение SFML--------------------------------------------------------------

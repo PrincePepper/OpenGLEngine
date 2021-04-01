@@ -1,3 +1,4 @@
+#pragma ones
 #include <iostream>
 #include <cmath>
 
@@ -19,6 +20,9 @@ class Vector2 {
   bool operator!=(const Vector2<T> &v) const {
     return x != v.x || y != v.y;
   }
+
+  // оператор =
+  Vector2 &operator=(const Vector2<T> &fresh) = default;
 
   /**********************************************
     Indexing operator
@@ -89,10 +93,10 @@ class Vector2 {
   /*******************************************
     Cast to T* (lets you use vec2 as T array)
   *******************************************/
-  operator const T *() const {
+  explicit operator const T *() const {
     return static_cast<T *>(&x);
   }
-  operator T *() {
+  explicit operator T *() {
     return static_cast<T *>(&x);
   }
 
@@ -252,10 +256,10 @@ class Vector3 {
   /*******************************************
     Cast to T* (lets you use vec2 as T array)
   *******************************************/
-  operator const T *() const {
+  explicit operator const T *() const {
     return static_cast<T *>(&x);
   }
-  operator T *() {
+  explicit operator T *() {
     return static_cast<T *>(&x);
   }
 
@@ -364,12 +368,17 @@ class Vector4 {
     return x != v.x || y != v.y || z != v.z || w != v.w;
   }
 
-  // template<class T>
-  // Vector4<T> operator*(T s, const Vector4<T> &v) {
-  //   return Vector4<T>(s * v.x, s * v.y, s * v.z, s * v.w);
-  // }
+  /**********************************************
+    Indexing operator
+  **********************************************/
+  T &operator[](int i) {
+    return *(&x + i);
+  }
+  T operator[](int i) const {
+    return *(&x + i);
+  }
 
-/*********************************************
+  /*********************************************
     Non modifying math operators
   *********************************************/
   Vector4<T> operator-() const {
@@ -433,10 +442,10 @@ class Vector4 {
   /*******************************************
     Cast to T* (lets you use vec2 as T array)
   *******************************************/
-  operator const T *() const {
+  explicit operator const T *() const {
     return static_cast<T *>(&x);
   }
-  operator T *() {
+  explicit operator T *() {
     return static_cast<T *>(&x);
   }
 
@@ -516,3 +525,17 @@ std::istream &operator>>(std::istream &ins, Vector4<T> &v) {
   return ins;
 }
 
+template<class T>
+class Point3D {
+ public:
+  T x, y, z, w;
+
+  Point3D(const T &s = T()) : x(s), y(s), z(s), w(s) {}
+  Point3D(const T &x, const T &y, const T &z, const T &w)
+      : x(x), y(y), z(z), w(w) {}
+  Point3D(const Point3D<T> &p) : x(p.x), y(p.y), z(p.z), w(p.w) {}
+  Point3D(const Point3D<T> &p, const Vector3<T> &v) : x(p.x + v.x),
+                                                      y(p.y + v.y),
+                                                      z(p.z + v.z),
+                                                      w(p.w) {}
+};
