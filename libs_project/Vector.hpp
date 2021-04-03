@@ -351,14 +351,14 @@ class Vector4 {
   T x, y, z, w;
 
   Vector4(const T &s = T()) : x(s), y(s), z(s), w(s) {}
-  Vector4(const T &x, const T &y, const T &z, const T &w = T()) :
-      x(x), y(y), z(z), w(w) {}
+  Vector4(const T &x, const T &y, const T &z, const T &w)
+      : x(x), y(y), z(z), w(w) {}
   Vector4(const Vector2<T> &v1, const Vector2<T> &v2)
       : x(v1.x), y(v1.y), z(v2.x), w(v2.y) {}
-  Vector4(const Vector2<T> &v, const T &z = T(), const T &w = T()) :
-      x(v.x), y(v.y), z(z), w(w) {}
-  Vector4(const Vector3<T> &v, const T &w = T()) :
-      x(v.x), y(v.y), z(v.z), w(w) {}
+  Vector4(const Vector2<T> &v, const T &z = T(), const T &w = T())
+      : x(v.x), y(v.y), z(z), w(w) {}
+  Vector4(const Vector3<T> &v, const T &w = T())
+      : x(v.x), y(v.y), z(v.z), w(w) {}
   Vector4(const Vector4<T> &v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 
   bool operator==(const Vector4<T> &v) const {
