@@ -9,7 +9,7 @@
 ***************************************************************************************/
 class Matrix2 {
  public:
-  Matrix2() : data2(0) {}
+  Matrix2() : data2(nullptr) {}
 
   explicit Matrix2(float number) {
     data2[0] = Vector2<float>(number, 0);
@@ -28,6 +28,11 @@ class Matrix2 {
 
   Matrix2(const Matrix2 &other) {
     data2 = other.data2;
+  }
+
+  Matrix2(const float *numbers) {
+    data2[0] = numbers[0];
+    data2[1] = numbers[1];
   }
 
   bool operator==(const Matrix2 &other) const {
@@ -209,6 +214,7 @@ class Matrix2 {
   [[nodiscard]] float find_determinant() const {
     return data2[0][0] * data2[1][1] - data2[0][1] * data2[1][0];
   }
+
 };
 
 /***************************************************************************************

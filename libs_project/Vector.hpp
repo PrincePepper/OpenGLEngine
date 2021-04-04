@@ -10,9 +10,11 @@ class Vector2 {
  public:
   T x, y;
 
-  Vector2(const T &s = T()) : x(s), y(s) {}
+  Vector2() : x(0), y(0) {}
+  Vector2(const T &s) : x(s), y(s) {}
   Vector2(const T &x, const T &y) : x(x), y(y) {}
   Vector2(const Vector2<T> &v) : x(v.x), y(v.y) {}
+  Vector2(const float *numbers) : x(numbers[0]), y(numbers[1]) {}
 
   bool operator==(const Vector2<T> &v) const {
     return x == v.x && y == v.y;
@@ -22,7 +24,11 @@ class Vector2 {
   }
 
   // оператор =
-  Vector2 &operator=(const Vector2<T> &fresh) = default;
+  Vector2 &operator=(const Vector2<T> &fresh) {
+    x = fresh.x;
+    y = fresh.y;
+    return *this;
+  }
 
   /**********************************************
     Indexing operator
@@ -103,6 +109,10 @@ class Vector2 {
   /********************************************
     Useful Vector Operations
   ********************************************/
+  [[nodiscard]] int size() const {
+    return 2;
+  }
+
   T length() const {
     return std::sqrt(x * x + y * y);
   }
@@ -111,6 +121,9 @@ class Vector2 {
   }
   Vector2<T> &normalize() {
     T length = this->length();
+    if (length == 0) {
+      throw std::runtime_error("Can't normalize zero vector");
+    }
     x /= length;
     y /= length;
     return *this;
@@ -175,10 +188,12 @@ class Vector3 {
  public:
   T x, y, z;
 
-  Vector3(const T &s = T()) : x(s), y(s), z(s) {}
+  Vector3() : x(0), y(0), z(0) {}
+  Vector3(const T &s) : x(s), y(s), z(s) {}
   Vector3(const T &x, const T &y, const T &z) : x(x), y(y), z(z) {}
   Vector3(const Vector2<T> &v, const T &s = T()) : x(v.x), y(v.y), z(s) {}
   Vector3(const Vector3<T> &v) : x(v.x), y(v.y), z(v.z) {}
+  Vector3(const float *numbers) : x(numbers[0]), y(numbers[1]), z(numbers[2]) {}
 
   bool operator==(const Vector3<T> &v) const {
     return x == v.x && y == v.y && z == v.z;
@@ -231,7 +246,7 @@ class Vector3 {
   Vector3<T> &operator-=(const Vector3<T> &v) {
     x -= v.x;
     y -= v.y;
-    y -= v.z;
+    z -= v.z;
     return *this;
   }
   Vector3<T> &operator*=(const T &s) {
@@ -266,6 +281,11 @@ class Vector3 {
   /********************************************
     Useful Vector Operations
   ********************************************/
+
+  [[nodiscard]] int size() const {
+    return 3;
+  }
+
   T length() const {
     return std::sqrt(x * x + y * y + z * z);
   }
@@ -274,6 +294,9 @@ class Vector3 {
   }
   Vector3<T> &normalize() {
     T length = this->length();
+    if (length == 0) {
+      throw std::runtime_error("Can't normalize zero vector");
+    }
     x /= length;
     y /= length;
     z /= length;
@@ -326,9 +349,13 @@ T dot(const Vector3<T> &v1, const Vector3<T> &v2) {
 }
 template<class T>
 Vector3<T> cross(const Vector3<T> &v1, const Vector3<T> &v2) {
-  return Vector3<T>(v1.y * v2.z - v1.z * v2.y,
-                    v1.z * v2.x - v1.x * v2.z,
-                    v1.x * v2.y - v1.y * v2.x);
+  int x = v1.y * v2.z - v1.z * v2.y;
+  int y = v1.z * v2.x - v1.x * v2.z;
+  int z = v1.x * v2.y - v1.y * v2.x;
+  return Vector3{v1.y * v2.z - v1.z * v2.y,
+                 v1.z * v2.x - v1.x * v2.z,
+                 v1.x * v2.y - v1.y * v2.x
+  };
 }
 
 template<class T>
@@ -350,7 +377,8 @@ class Vector4 {
  public:
   T x, y, z, w;
 
-  Vector4(const T &s = T()) : x(s), y(s), z(s), w(s) {}
+  Vector4() : x(0), y(0), z(0), w(0) {}
+  Vector4(const T &s) : x(s), y(s), z(s), w(s) {}
   Vector4(const T &x, const T &y, const T &z, const T &w)
       : x(x), y(y), z(z), w(w) {}
   Vector4(const Vector2<T> &v1, const Vector2<T> &v2)
@@ -360,6 +388,8 @@ class Vector4 {
   Vector4(const Vector3<T> &v, const T &w = T())
       : x(v.x), y(v.y), z(v.z), w(w) {}
   Vector4(const Vector4<T> &v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+  Vector4(const float *numbers)
+      : x(numbers[0]), y(numbers[1]), z(numbers[2]), w(numbers[3]) {}
 
   bool operator==(const Vector4<T> &v) const {
     return x == v.x && y == v.y && z == v.z && w == v.w;
@@ -388,7 +418,7 @@ class Vector4 {
     return Vector4<T>(x + v.x, y + v.y, z + v.z, w + v.w);
   }
   Vector4<T> operator-(const Vector4<T> &v) const {
-    return Vector4<T>(x - v.x, y - v.y, z - v.z, w + v.w);
+    return Vector4<T>(x - v.x, y - v.y, z - v.z, w - v.w);
   }
   Vector4<T> operator*(const T &s) const {
     return Vector4<T>(x * s, y * s, z * s, w * s);
@@ -413,7 +443,7 @@ class Vector4 {
   Vector4<T> &operator-=(const Vector4<T> &v) {
     x -= v.x;
     y -= v.y;
-    y -= v.z;
+    z -= v.z;
     w -= v.w;
     return *this;
   }
@@ -452,6 +482,10 @@ class Vector4 {
   /********************************************
     Useful Vector Operations
   ********************************************/
+  [[nodiscard]] int size() const {
+    return 4;
+  }
+
   T length() const {
     return std::sqrt(x * x + y * y + z * z + w * w);
   }
@@ -460,6 +494,9 @@ class Vector4 {
   }
   Vector4<T> &normalize() {
     T length = this->length();
+    if (length == 0) {
+      throw std::runtime_error("Can't normalize zero vector");
+    }
     x /= length;
     y /= length;
     z /= length;
