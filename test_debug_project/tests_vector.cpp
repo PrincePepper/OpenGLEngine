@@ -15,15 +15,6 @@ void compare_vectors(T glm_vector, const H &my_vec) {
   }
 }
 
-template<typename T, typename H>
-void compare_matrix(T glm_matrix, const H &my_mat) {
-  for (int i = 0; i < my_mat.size(); ++i) {
-    for (int j = 0; j < my_mat.size(); ++j) {
-      REQUIRE(std::abs(glm_matrix[i][j] - my_mat[i][j]) < EPS);
-    }
-  }
-}
-
 TEST_CASE("VECTOR") {
   auto *numbers2 = new float[2];
   numbers2[0] = 34.7;
