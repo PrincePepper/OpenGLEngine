@@ -14,6 +14,7 @@ add_executable(TestProjectLibs test_glew_sfml.cpp)
 add_executable(test1 libs_project/Vector.hpp testl.cpp libs_project/Matrix.hpp)
 add_executable(TestVectorLib test_debug_project/tests_vector.cpp libs_project/Vector.hpp)
 add_executable(TestMatrixLib test_debug_project/tests_matrix.cpp libs_project/Matrix.hpp)
+add_executable(tesdds libs_project/Vector.hpp libs_project/Camera.hpp libs_project/Matrix.hpp testl.cpp)
 #------------------------------------------------------------------------------
 
 #подключение SFML--------------------------------------------------------------
