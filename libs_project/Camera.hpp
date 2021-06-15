@@ -1,13 +1,11 @@
-//
-// Created by User on 14.06.2021.
-//
+#pragma once
 
 #ifndef OPENGLENGINE_CAMERA_HPP
 #define OPENGLENGINE_CAMERA_HPP
 
 #include <SFML/Window.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../libs/glm/glm/glm.hpp"
+#include "../libs/glm/glm/gtc/matrix_transform.hpp"
 
 #include "Matrix.hpp"
 
@@ -21,16 +19,6 @@ public:
 
     Matrix4 get_view_matrix() {
         return look_at(camera_position, camera_position + camera_front, camera_up);
-    }
-
-    static Matrix4 get_view_matrix_without_translation() {
-        Matrix4 result = look_at(camera_position, camera_position + camera_front, camera_up);
-        result[3][0] = 0;
-        result[3][1] = 0;
-        result[3][2] = 0;
-        result[3][3] = 1;
-
-        return result;
     }
 
     static Matrix4 get_projection_matrix() {
@@ -59,15 +47,15 @@ public:
 
     void mouse_input(sf::Window &window, float x_pos, float y_pos) {
         if (firstMouse) {
-            last_x = x_pos;
-            last_y = y_pos;
+            lastX = x_pos;
+            lastY = y_pos;
             firstMouse = false;
         }
 
-        float x_offset = x_pos - last_x;
-        float y_offset = last_y - y_pos;
-        last_x = x_pos;
-        last_y = y_pos;
+        float x_offset = x_pos - lastX;
+        float y_offset = lastY - y_pos;
+        lastX = x_pos;
+        lastY = y_pos;
 
         x_offset *= speed;
         y_offset *= speed;
@@ -75,6 +63,7 @@ public:
         yaw += x_offset;
         pitch += y_offset;
 
+        // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (pitch > 89.0f) {
             pitch = 89.0f;
         }
@@ -90,18 +79,6 @@ public:
         camera_front = front.normalize();
     }
 
-    const Vector3<float> &get_camera_position() const {
-        return camera_position;
-    }
-
-    const Vector3<float> &get_camera_front() const {
-        return camera_front;
-    }
-
-    const Vector3<float> &get_camera_up() const {
-        return camera_up;
-    }
-
 private:
     Vector3<float> camera_position;
     Vector3<float> camera_front;
@@ -113,8 +90,8 @@ private:
     float pitch = 0.0;
     bool firstMouse = true;
 
-    float last_x;
-    float last_y;
+    float lastX;
+    float lastY;
 };
 
-#endif //OPENGLENGINE_CAMERA_HPP
+#endif //OPENGLENGINE_ЫВ_H
