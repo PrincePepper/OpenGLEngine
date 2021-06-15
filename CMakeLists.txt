@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(OpenGLEngine)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 set(SFML_STATIC_LIBRARIES TRUE)
 
@@ -10,11 +11,11 @@ set(SFML_LIBRARY_DIR "libs/SFML-2.5.1/lib")
 set(SFML_DIR "libs/SFML-2.5.1/lib/cmake/SFML")
 
 #подключение файликов----------------------------------------------------------
-add_executable(TestProjectLibs test_glew_sfml.cpp)
+add_executable(TestProjectLibs test_glew_sfml.cpp libs_project/Vector.hpp libs_project/Matrix.hpp utils/Shader.hpp utils/shaderLoader.cpp utils/shaderLoader.hpp)
 add_executable(test1 libs_project/Vector.hpp testl.cpp libs_project/Matrix.hpp)
 add_executable(TestVectorLib test_debug_project/tests_vector.cpp libs_project/Vector.hpp)
 add_executable(TestMatrixLib test_debug_project/tests_matrix.cpp libs_project/Matrix.hpp)
-add_executable(tesdds libs_project/Vector.hpp libs_project/Camera.hpp libs_project/Matrix.hpp testl.cpp)
+add_executable(ShaderTest utils/Shader.hpp utils/shaderLoader.cpp utils/shaderLoader.hpp test_glew_sfml.cpp)
 #------------------------------------------------------------------------------
 
 #подключение SFML--------------------------------------------------------------
