@@ -1,5 +1,8 @@
 #pragma ones
 
+#ifndef OPENGLENGINE_VECTOR_HPP
+#define OPENGLENGINE_VECTOR_HPP
+
 #include <iostream>
 #include <cmath>
 
@@ -677,3 +680,5 @@ public:
                                                         z(p.z + v.z),
                                                         w(p.w) {}
 };
+
+#endif //OPENGLENGINE_VECTOR_HPP

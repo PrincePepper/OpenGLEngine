@@ -1,9 +1,14 @@
+#pragma ones
+
 #include <cmath>
 #include <iostream>
 #include <cassert>
 #include <vector>
-//#include <vector>
+#include <iomanip>
 #include "Vector.hpp"
+
+#ifndef OPENGLENGINE_MATRIX_HPP
+#define OPENGLENGINE_MATRIX_HPP
 
 /***************************************************************************************
   Matrix2
@@ -394,12 +399,12 @@ public:
 
     bool operator==(const Matrix3 &other) const {
         return data3.x == other.data3.x && data3.y == other.data3.y
-               && data3.z == other.data3.z;
+                                           && data3.z == other.data3.z;
     }
 
     bool operator!=(const Matrix3 &other) const {
         return data3.x != other.data3.x || data3.y != other.data3.y
-               || data3.z != other.data3.z;
+                                           || data3.z != other.data3.z;
     }
 
     /*********************************************
@@ -700,9 +705,9 @@ private:
     [[nodiscard]] float find_determinant() const {
         return data3[0][0] * (data3[1][1] * data3[2][2] - data3[2][1] * data3[1][2])
                - data3[1][0] *
-                 (data3[0][1] * data3[2][2] - data3[2][1] * data3[0][2])
+                       (data3[0][1] * data3[2][2] - data3[2][1] * data3[0][2])
                + data3[2][0] *
-                 (data3[0][1] * data3[1][2] - data3[1][1] * data3[0][2]);
+                       (data3[0][1] * data3[1][2] - data3[1][1] * data3[0][2]);
     }
 };
 
@@ -770,12 +775,12 @@ public:
 
     bool operator==(const Matrix4 &other) const {
         return data4.x == other.data4.x && data4.y == other.data4.y
-               && data4.z == other.data4.z && data4.w == other.data4.w;
+                                           && data4.z == other.data4.z && data4.w == other.data4.w;
     }
 
     bool operator!=(const Matrix4 &other) const {
         return data4.x != other.data4.x || data4.y != other.data4.y
-               || data4.z != other.data4.z || data4.w != other.data4.w;
+                                           || data4.z != other.data4.z || data4.w != other.data4.w;
     }
 
     /*********************************************
@@ -1399,3 +1404,5 @@ static Matrix4 ortho(const float &right, const float &left, const float &top, co
 
     return matrix;
 }
+
+#endif //OPENGLENGINE_MATRIX_HPP
