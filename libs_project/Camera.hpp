@@ -79,6 +79,14 @@ public:
         camera_front = front.normalize();
     }
 
+    [[nodiscard]] int getIdCam() const {
+        return id_cam;
+    }
+
+    void setIdCam(int idCam) {
+        id_cam = idCam;
+    }
+
 private:
     Vector3<float> camera_position;
     Vector3<float> camera_front;
@@ -89,6 +97,8 @@ private:
     float yaw = -90.0;
     float pitch = 0.0;
     bool firstMouse = true;
+
+    int id_cam = 0;
 
     float lastX;
     float lastY;

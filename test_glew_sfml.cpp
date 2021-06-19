@@ -37,8 +37,9 @@ int main() {
     std::string s2 = "../res/shaders/e4.fs";
     Shader my_shader(s1, s2);
 
-    Camera camera;
-
+    std:
+    vector<Camera> camera(2);
+    int inj = 0;
     float vertices[] = {
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
             -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
@@ -101,10 +102,14 @@ int main() {
                     isGo = false;
                     break;
                 case sf::Event::KeyPressed:
-                    camera.keyboard_input();
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+                        if (inj == 0)
+                            inj = 1;
+                        else inj = 0;
+                    camera[inj].keyboard_input();
                     break;
                 case sf::Event::MouseMoved:
-                    camera.mouse_input(window, window_event.mouseMove.x, window_event.mouseMove.y);
+                    camera[inj].mouse_input(window, window_event.mouseMove.x, window_event.mouseMove.y);
                     break;
                 default:
                     break;
@@ -121,7 +126,7 @@ int main() {
         glBindVertexArray(VAO);
 
         Matrix4 model = Matrix4::identity_matrix();
-        Matrix4 view(camera.get_view_matrix());
+        Matrix4 view(camera[inj].get_view_matrix());
         Matrix4 projection(Camera::get_projection_matrix());
 
         my_shader.set_mat4("model", model);
