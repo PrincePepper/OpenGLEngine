@@ -26,7 +26,7 @@ public:
     }
 
     static Matrix4 get_projection_matrix_ortho() {//-1.0, 1.0, -1.0, 1.0, -1.0, 1.0
-        return ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+        return ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
     }
 
     void keyboard_input() {
