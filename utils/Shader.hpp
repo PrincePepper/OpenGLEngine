@@ -16,14 +16,14 @@ public:
     }
 
     void set_mat4(const GLchar *name, const Matrix4 &data) const {
-        glm::mat4 glm_matrix = matrix_to_glm(data);
-        glUniformMatrix4fv(glGetUniformLocation(shader_id, name), 1, GL_FALSE, &glm_matrix[0][0]);
+        std::vector<float> glm_matrix = matrix_to_glm(data);
+        glUniformMatrix4fv(glGetUniformLocation(shader_id, name), 1, GL_FALSE, &glm_matrix[0]);
     }
 
 private:
     GLuint shader_id;
 
-    static glm::mat4 matrix_to_glm(const Matrix4 &data) {
+    static std::vector<float> matrix_to_glm(const Matrix4 &data) {
         return {
                 data[0][0], data[0][1], data[0][2], data[0][3],
                 data[1][0], data[1][1], data[1][2], data[1][3],
@@ -31,4 +31,5 @@ private:
                 data[3][0], data[3][1], data[3][2], data[3][3]
         };
     }
+
 };
