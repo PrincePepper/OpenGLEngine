@@ -13,6 +13,25 @@
 
 using namespace std;
 
+void DrawGrid(float cx, float cz, float step) {
+    float _cx = cx / 2;
+    float _cz = cz / 2;
+
+    for (float x = -_cx; x <= _cx; x += step) {
+        glBegin(GL_LINES);
+        glVertex3f(x, -1.0, _cz);
+        glVertex3f(x, -1.0, -_cz);
+        glEnd();
+    }
+
+    for (float z = -_cz; z <= _cz; z += step) {
+        glBegin(GL_LINES);
+        glVertex3f(_cx, -1.0, z);
+        glVertex3f(-_cx, -1.0, z);
+        glEnd();
+    }
+}
+
 int main() {
     sf::ContextSettings settings;
     settings.depthBits = 24; // количество битов буффера глубины
@@ -145,6 +164,7 @@ int main() {
         my_shader.set_mat4("view", view);
         my_shader.set_mat4("projection", projection);
 
+        DrawGrid(50.f, 50.f, 0.5f);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         window.display();
