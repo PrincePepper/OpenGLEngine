@@ -21,8 +21,12 @@ public:
         return look_at(camera_position, camera_position + camera_front, camera_up);
     }
 
-    static Matrix4 get_projection_matrix() {
+    static Matrix4 get_projection_matrix_perspective() {
         return perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+    }
+
+    static Matrix4 get_projection_matrix_ortho() {//-1.0, 1.0, -1.0, 1.0, -1.0, 1.0
+        return ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
     }
 
     void keyboard_input() {
@@ -79,12 +83,16 @@ public:
         camera_front = front.normalize();
     }
 
-    [[nodiscard]] int getIdCam() const {
-        return id_cam;
+    [[nodiscard]] const Vector3<float> &get_camera_position() const {
+        return camera_position;
     }
 
-    void setIdCam(int idCam) {
-        id_cam = idCam;
+    [[nodiscard]] const Vector3<float> &get_camera_front() const {
+        return camera_front;
+    }
+
+    [[nodiscard]] const Vector3<float> &get_camera_up() const {
+        return camera_up;
     }
 
 private:
@@ -97,8 +105,6 @@ private:
     float yaw = -90.0;
     float pitch = 0.0;
     bool firstMouse = true;
-
-    int id_cam = 0;
 
     float lastX;
     float lastY;

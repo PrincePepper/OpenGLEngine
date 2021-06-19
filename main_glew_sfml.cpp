@@ -24,8 +24,13 @@ int main() {
     sf::Window window(sf::VideoMode(1200, 900, 32), "First Window",
                       sf::Style::Titlebar | sf::Style::Close);
 
+    window.setMouseCursorVisible(false);
+
     glewExperimental = GL_TRUE; // включить все современные функции ogl
 
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDepthRange(0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
     if (GLEW_OK != glewInit()) { // включить glew
@@ -37,9 +42,9 @@ int main() {
     std::string s2 = "../res/shaders/e4.fs";
     Shader my_shader(s1, s2);
 
-    std:
     vector<Camera> camera(2);
     int inj = 0;
+
     float vertices[] = {
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
             -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
@@ -127,7 +132,14 @@ int main() {
 
         Matrix4 model = Matrix4::identity_matrix();
         Matrix4 view(camera[inj].get_view_matrix());
-        Matrix4 projection(Camera::get_projection_matrix());
+        Matrix4 projection;
+        if (inj == 1) {
+            projection = (Camera::get_projection_matrix_ortho());
+            cout << "ortho camera" << endl;
+        } else {
+            projection = (Camera::get_projection_matrix_perspective());
+            cout << "perspective camera" << endl;
+        }
 
         my_shader.set_mat4("model", model);
         my_shader.set_mat4("view", view);
