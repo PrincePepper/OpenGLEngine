@@ -1337,6 +1337,20 @@ static Matrix4 scale(const Vector3<float> &other) {
     return matrix;
 }
 
+static Matrix4 transform(const Vector3<float> &other) {
+    if (other.size() != 3) {
+        throw std::runtime_error("Can't make matrix. Vector dimension is not three");
+    }
+
+    Matrix4 matrix = Matrix4::identity_matrix();
+    for (int i = 0; i < 3; ++i) {
+        matrix[3][i] = other[i];
+    }
+
+    return matrix;
+}
+
+
 static Matrix4 rotate(const float &alpha, const float &beta, const float &gamma) {
     Matrix4 x_matrix = Matrix4::identity_matrix();
     Matrix4 y_matrix = Matrix4::identity_matrix();
