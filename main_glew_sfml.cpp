@@ -2,7 +2,12 @@
 #define OPENGLENGINE_MAIN_CPP
 
 #include <iostream>
+
+#include <vector>
+
 #include <GL/glew.h>
+
+
 #include <SFML/Window.hpp>
 
 #include "libs/stb/stb_image.h"
@@ -10,27 +15,86 @@
 #include "utils/shaderLoader.hpp"
 #include "libs_project/Camera.hpp"
 #include "utils/Shader.hpp"
+#include "libs_project/Objects.h"
+#include "libs_project/Sphere.h"
 
 using namespace std;
 
-void DrawGrid(float cx, float cz, float step) {
-    float _cx = cx / 2;
-    float _cz = cz / 2;
+[[maybe_unused]] float lines[] = {
+        0.0f, 0.0f, 0.0f,
+        0.0f, 1.0, 0.0f
+};
 
-    for (float x = -_cx; x <= _cx; x += step) {
-        glBegin(GL_LINES);
-        glVertex3f(x, -1.0, _cz);
-        glVertex3f(x, -1.0, -_cz);
-        glEnd();
-    }
+[[maybe_unused]] float square[] = {
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+};
 
-    for (float z = -_cz; z <= _cz; z += step) {
-        glBegin(GL_LINES);
-        glVertex3f(_cx, -1.0, z);
-        glVertex3f(-_cx, -1.0, z);
-        glEnd();
-    }
-}
+[[maybe_unused]] float cube[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+
+[[maybe_unused]] float tetra[] = {
+        //нижний
+        0.0f, 0.0f, 0.0f, 0.25f, 0.43f,
+        0.86f, 0.0f, 0.0f, 0.5f, 0.0f,
+        0.43f, 0.86f, 0.0f, 0.75f, 0.43f,
+        //задний
+        0.0f, 0.0f, 0.0f, 0.26f, 0.43f,
+        0.43f, 0.86f, 0.0f, 0.75f, 0.43f,
+        0.43f, 0.43f, 0.43f, 0.5f, 0.86f,
+        //правый
+        0.86f, 0.0f, 0.0f, 0.5f, 0.0f,
+        0.43f, 0.86f, 0.0f, 0.75f, 0.43f,
+        0.43f, 0.43f, 0.43f, 1.0f, 0.0f,
+        //левый
+        0.0f, 0.0f, 0.0f, 0.25f, 0.43f,
+        0.86f, 0.0f, 0.0f, 0.5f, 0.0f,
+        0.43f, 0.43f, 0.43f, 0.0f, 0.0f
+};
 
 int main() {
     sf::ContextSettings settings;
@@ -40,17 +104,14 @@ int main() {
     settings.minorVersion = 3;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::Window window(sf::VideoMode(1200, 900, 32), "First Window",
-                      sf::Style::Titlebar | sf::Style::Close);
+    sf::Window window(sf::VideoMode(1800, 1080, 32), "First Window",
+                      sf::Style::Titlebar | sf::Style::Close, settings);
 
-    window.setMouseCursorVisible(false);
+    window.setMouseCursorVisible(false); // отсключить указатель мышки
 
     glewExperimental = GL_TRUE; // включить все современные функции ogl
 
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDepthRange(0.0f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
+    initgl();
 
     if (GLEW_OK != glewInit()) { // включить glew
         cout << "Error:: glew not init =(" << endl;
@@ -61,60 +122,81 @@ int main() {
     std::string s2 = "../res/shaders/e4.fs";
     Shader my_shader(s1, s2);
 
+    Vector3<float> lightPos{1.2f, 1.0f, 2.0f};
+
     vector<Camera> camera(2);
     int inj = 0;
 
-    float vertices[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-            0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-    };
-
-    unsigned int indices[] = {
-            0, 1, 3,
-            1, 2, 3
-    };
-
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
+    unsigned int VBO, EBO, cubeVAO, tetraVAO, squareVAO, sphereVAO;
+    glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
+
+    glBindVertexArray(cubeVAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
+
+    glGenVertexArrays(1, &tetraVAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(tetraVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tetra), tetra, GL_STATIC_DRAW);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    glGenVertexArrays(1, &squareVAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(squareVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    unsigned int lineVAO;
+    glGenVertexArrays(1, &lineVAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(lineVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lines), lines, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    /// Добавление текстуры
     unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int width, height, nr_channels;
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned char *data = stbi_load("../res/img/2.jpg", &width, &height, &nr_channels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+    createTexture(texture, "../res/img/2.jpg");
 
     bool isGo = true;
 
@@ -126,10 +208,10 @@ int main() {
                     isGo = false;
                     break;
                 case sf::Event::KeyPressed:
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-                        if (inj == 0)
-                            inj = 1;
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+                        if (inj == 0) inj = 1;
                         else inj = 0;
+                    }
                     camera[inj].keyboard_input();
                     break;
                 case sf::Event::MouseMoved:
@@ -140,14 +222,15 @@ int main() {
             }
         }
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.5f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // bind textures on corresponding texture units
+        glActiveTexture(GL_TEXTURE);
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        // activate shader
         my_shader.use();
-
-        glBindVertexArray(VAO);
 
         Matrix4 model = Matrix4::identity_matrix();
         Matrix4 view(camera[inj].get_view_matrix());
@@ -165,7 +248,40 @@ int main() {
         my_shader.set_mat4("projection", projection);
 
         DrawGrid(50.f, 50.f, 0.5f);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+        glm::vec3 cubePositions[] = {
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(2.0f, 5.0f, -15.0f),
+                glm::vec3(-1.5f, -2.2f, -2.5f),
+                glm::vec3(-3.8f, -2.0f, -12.3f),
+                glm::vec3(2.4f, -0.4f, -3.5f),
+                glm::vec3(-1.7f, 3.0f, -7.5f),
+                glm::vec3(1.3f, -2.0f, -2.5f),
+                glm::vec3(1.5f, 2.0f, -2.5f),
+                glm::vec3(1.5f, 0.2f, -1.5f),
+                glm::vec3(-1.3f, 1.0f, -1.5f)
+        };
+        // first object
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // second object
+        Matrix4 trans1 = transform(Vector3<float>(2 * 0.9f, 0, 0));
+        my_shader.set_mat4("model", trans1);
+        glBindVertexArray(tetraVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 12);
+
+        // third object
+        Matrix4 trans2 = transform(Vector3<float>(-2 * 0.9f, 0, 0));
+        my_shader.set_mat4("model", trans2);
+        glBindVertexArray(squareVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // four object
+        Matrix4 trans3 = transform(Vector3<float>(0, -1.0, 0));
+        my_shader.set_mat4("model", trans3);
+        glBindVertexArray(lineVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 2);
 
         window.display();
     }
