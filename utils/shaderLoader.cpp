@@ -7,7 +7,7 @@
 #include <vector>
 
 
-GLuint LoadShaders(const std::string &vertex_file_path, const std::string &fragment_file_path) {
+GLuint LoadShaders(const std::string vertex_file_path, const std::string fragment_file_path) {
     // Create the shaders
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
