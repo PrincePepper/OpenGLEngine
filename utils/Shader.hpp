@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include "../libs/glm/glm/glm.hpp"
 #include "../libs_project/Matrix.hpp"
+#include "../libs_project/Material.hpp"
 
 class Shader {
 public:
@@ -30,6 +31,22 @@ public:
 
     [[nodiscard]] GLuint get_shader_id() const {
         return shader_id;
+    }
+
+    void set_float(const std::string &name, float value) const {
+        glUniform1f(glGetUniformLocation(shader_id, &name[0]), value);
+    }
+
+    void set_int(const std::string &name, int value) const {
+        glUniform1i(glGetUniformLocation(shader_id, &name[0]), value);
+    }
+
+    void LoadLightShaders(int diffuse, int specular, float shininess) {
+        this->use();
+        Material material(diffuse, specular, shininess);
+        this->set_int("material.diffuse", material.get_diffuse());
+        this->set_int("material.specular", material.get_specular());
+        this->set_float("material.shininess", material.get_shininess());
     }
 
 private:
