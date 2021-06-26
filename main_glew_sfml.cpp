@@ -13,7 +13,7 @@
 #include "utils/shaderLoader.hpp"
 #include "libs_project/Camera.hpp"
 #include "utils/Shader.hpp"
-#include "libs_project/Objects.h"
+#include "libs_project/Objects.hpp"
 
 using namespace std;
 

@@ -11,7 +11,7 @@ set(SFML_LIBRARY_DIR "libs/SFML-2.5.1/lib")
 set(SFML_DIR "libs/SFML-2.5.1/lib/cmake/SFML")
 
 #подключение файликов----------------------------------------------------------
-add_executable(TestProjectLibs main_glew_sfml.cpp libs_project/Vector.hpp libs_project/Matrix.hpp utils/Shader.hpp utils/shaderLoader.cpp utils/shaderLoader.hpp libs_project/Objects.h libs_project/Sphere.cpp libs_project/Sphere.h)
+add_executable(TestProjectLibs main_glew_sfml.cpp libs_project/Vector.hpp libs_project/Matrix.hpp utils/Shader.hpp utils/shaderLoader.cpp utils/shaderLoader.hpp libs_project/Objects.hpp libs_project/Sphere.cpp libs_project/Sphere.h)
 add_executable(TestVectorLib test_debug_project/tests_vector.cpp libs_project/Vector.hpp)
 add_executable(TestMatrixLib test_debug_project/tests_matrix.cpp libs_project/Matrix.hpp)
 #------------------------------------------------------------------------------
