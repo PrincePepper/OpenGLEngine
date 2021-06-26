@@ -21,8 +21,8 @@ public:
         return look_at(camera_position, camera_position + camera_front, camera_up);
     }
 
-    static Matrix4 get_projection_matrix_perspective() {
-        return perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+    [[nodiscard]]  Matrix4 get_projection_matrix_perspective() const {
+        return perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
     }
 
     static Matrix4 get_projection_matrix_ortho() {//-1.0, 1.0, -1.0, 1.0, -1.0, 1.0
@@ -83,6 +83,15 @@ public:
         camera_front = front.normalize();
     }
 
+    void scroll_callback(sf::Window &window, double xoffset, double yoffset) {
+        if (fov > 1.0f && fov < 45.0f)
+            fov -= yoffset;
+        else if (fov <= 1.0f)
+            fov = 1.0f;
+        else if (fov >= 45.0f)
+            fov = 45.0f;
+    }
+
     [[nodiscard]] const Vector3<float> &get_camera_position() const {
         return camera_position;
     }
@@ -101,6 +110,7 @@ private:
     Vector3<float> camera_up;
 
     float speed = 0.2;
+    float fov = 45.0f;
 
     float yaw = -90.0;
     float pitch = 0.0;

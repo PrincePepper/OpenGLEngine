@@ -1341,7 +1341,6 @@ static Matrix4 transform(const Vector3<float> &other) {
     if (other.size() != 3) {
         throw std::runtime_error("Can't make matrix. Vector dimension is not three");
     }
-
     Matrix4 matrix = Matrix4::identity_matrix();
     for (int i = 0; i < 3; ++i) {
         matrix[3][i] = other[i];
@@ -1393,17 +1392,17 @@ static Matrix4 look_at(const Vector3<float> &from, const Vector3<float> &to, con
     return matrix;
 }
 
-static Matrix4 perspective(const float &fov, const float &ratio, const float &nears, const float &fars) {
-    Matrix4 matrix;
+ Matrix4 perspective(const float &fov, const float &ratio, const float &nears, const float &fars) {
+     Matrix4 matrix;
 
-    matrix[0][0] = 1 / (ratio * std::tan(fov / 2));
-    matrix[1][1] = 1 / std::tan(fov / 2);
-    matrix[2][2] = (nears + fars) / (nears - fars);
-    matrix[2][3] = -1;
-    matrix[3][2] = (2 * fars * nears) / (nears - fars);
+     matrix[0][0] = 1 / (ratio * std::tan(fov / 2));
+     matrix[1][1] = 1 / std::tan(fov / 2);
+     matrix[2][2] = (nears + fars) / (nears - fars);
+     matrix[2][3] = -1;
+     matrix[3][2] = (2 * fars * nears) / (nears - fars);
 
-    return matrix;
-}
+     return matrix;
+ }
 
 static Matrix4 ortho(const float &right, const float &left, const float &top, const float &bottom, const float &nears,
                      const float &fars) {
