@@ -14,6 +14,10 @@
 #include "libs_project/Camera.hpp"
 #include "utils/Shader.hpp"
 #include "libs_project/Objects.hpp"
+#include "libs_project/Texture.hpp"
+#include "libs_project/Material.hpp"
+#include "libs_project/LightSource.hpp"
+#include "utils/LightningShaderFiller.hpp"
 
 using namespace std;
 
@@ -36,20 +40,28 @@ int main() {
         return -1;
     }
 
-    std::string s1 = "../res/shaders/lighting.vs";
-    std::string s2 = "../res/shaders/lighting.fs";
-    Shader lighting_shader(s1, s2);
+    std::string s1 = "../res/shaders/directionalLightingShader.vs";
+    std::string s2 = "../res/shaders/directionalLightingShader.fs";
+    Shader directional(s1, s2);
 
-    std::string s3 = "../res/shaders/def_shader.vs";
-    std::string s4 = "../res/shaders/def_shader.fs";
-    Shader light_cube_shader(s3, s4);
+    std::string s3 = "../res/shaders/pointLightingShader.vs";
+    std::string s4 = "../res/shaders/pointLightingShader.fs";
+    Shader point(s3, s4);
 
-    Vector3<float> lightPos{2.0f, 1.0f, 1.0f};
+    std::string s5 = "../res/shaders/spotLightingShader.vs";
+    std::string s6 = "../res/shaders/spotLightingShader.fs";
+    Shader spot(s5, s6);
+
+    std::string s7 = "../res/shaders/defShader.vs";
+    std::string s8 = "../res/shaders/defShader.fs";
+    Shader light_cube_shader(s7, s8);
+
+    Vector3<float> lightPos{1.3f, 1.3f, 1.3f};
     vector<Camera> camera(2);
     int inj = 0;
 
-    ///---------------------------------------------------------------------------------------------
     unsigned int VBO, EBO, cubeVAO, tetraVAO, squareVAO, sphereVAO, lineVAO, lightCubeVAO;
+    ///---------------------------------------------------------------------------------------------
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
 
@@ -72,12 +84,8 @@ int main() {
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------------------------------------------------------------------------
@@ -135,9 +143,13 @@ int main() {
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------Добавление текстур-----------------------------------------------
-    unsigned int texture;
-    createTexture(texture, "../res/img/2.jpg");
+    unsigned int tex = Texture("../res/img/2.jpg").get_texture_id();
     ///---------------------------------------------------------------------------------------------
+
+
+    point.LoadLightShaders(0, 1, 32.0f);
+    spot.LoadLightShaders(0, 1, 32.0f);
+    directional.LoadLightShaders(0, 1, 32.0f);
 
     bool isGo = true;
 
@@ -167,51 +179,29 @@ int main() {
             }
         }
 
-
         glClearColor(0.5f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // bind textures on corresponding texture units
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tex);
+
+//        addLight(directional, camera[inj], LightSource::DIRECTIONAL);
+//        addLight(point, camera[inj], LightSource::POINT);
+        addLight(spot, camera[inj], LightSource::SPOT);
 
         Matrix4 model = Matrix4::identity_matrix();
         Matrix4 view(camera[inj].get_view_matrix());
         Matrix4 projection;
         if (inj == 1) {
             projection = (camera[inj].get_projection_matrix_ortho());
-            cout << "ortho camera" << endl;
         } else {
             projection = camera[inj].get_projection_matrix_perspective();
-            cout << "perspective camera" << endl;
         }
 
-        lighting_shader.use();
-        lighting_shader.set_vec3("objectColor", Vector3<float>(0.0f, 1.0f, 0.0f));
-        lighting_shader.set_vec3("lightColor", Vector3<float>(1.0f, 1.0f, 1.0f));
-        lighting_shader.set_vec3("lightPos", lightPos);
-        lighting_shader.set_vec3("viewPos", camera[inj].get_camera_position());
-        lighting_shader.set_mat4("projection", projection);
-        lighting_shader.set_mat4("view", view);
-        lighting_shader.set_mat4("model", model);
-
-        // first object
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // second object
-        Matrix4 trans1 = transform(Vector3<float>(2 * 0.9f, 0, 0));
-        lighting_shader.set_mat4("model", trans1);
-        glBindVertexArray(tetraVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 12);
-
-        // third object
-        Matrix4 trans2 = transform(Vector3<float>(-2 * 0.9f, 0, 0));
-        lighting_shader.set_mat4("model", trans2);
-        glBindVertexArray(squareVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        // four object
-        Matrix4 trans3 = transform(Vector3<float>(0, -1.0, 0));
-        lighting_shader.set_mat4("model", trans3);
-        glBindVertexArray(lineVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 2);
+        spot.set_mat4("projection", projection);
+        spot.set_mat4("view", view);
+        spot.set_mat4("model", model);
 
         Vector3<float> cubePositions[] = {
                 Vector3<float>(0.0f, 0.0f, 0.0f),
@@ -231,31 +221,59 @@ int main() {
         for (unsigned int i = 0; i < 10; i++) {
             Matrix4 transs = transform(cubePositions[i]);
             float angle = 20.0f * i;
-            transs =
-                    transs * rotate(glm::radians(angle) * 1.0f, glm::radians(angle) * 0.3f, glm::radians(angle) * 0.5f);
-            lighting_shader.set_mat4("model", transs);
+            transs = transs * rotate(glm::radians(angle) * 1.0f, glm::radians(angle) * 0.3f,
+                                     glm::radians(angle) * 0.5f);
+            spot.set_mat4("model", transs);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        // bind textures on corresponding texture units
-        glActiveTexture(GL_TEXTURE);
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        light_cube_shader.use();
-        light_cube_shader.set_mat4("projection", projection);
-        light_cube_shader.set_mat4("view", view);
-        model = transform(lightPos);
-
-        light_cube_shader.set_mat4("model", model);
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        light_cube_shader.use();
+//        light_cube_shader.set_mat4("projection", projection);
+//        light_cube_shader.set_mat4("view", view);
+//        model = transform(lightPos);
+//
+//        light_cube_shader.set_mat4("model", model);
+//        glBindVertexArray(lightCubeVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         window.display();
     }
+
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteVertexArrays(1, &lightCubeVAO);
+
+    glDeleteVertexArrays(1, &tetraVAO);
+    glDeleteVertexArrays(1, &squareVAO);
+    glDeleteVertexArrays(1, &lineVAO);
+
+    glDeleteBuffers(1, &VBO);
 
     window.close();
     return 0;
 }
 
 #endif //OPENGLENGINE_MAIN_CPP
+
+
+//        // first object
+//        glBindVertexArray(cubeVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
+//
+//        // second object
+//        Matrix4 trans1 = transform(Vector3<float>(2 * 0.9f, 0, 0));
+//        lighting_shader.set_mat4("model", trans1);
+//        glBindVertexArray(tetraVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 12);
+//
+//        // third object
+//        Matrix4 trans2 = transform(Vector3<float>(-2 * 0.9f, 0, 0));
+//        lighting_shader.set_mat4("model", trans2);
+//        glBindVertexArray(squareVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 6);
+//
+//        // four object
+//        Matrix4 trans3 = transform(Vector3<float>(0, -1.0, 0));
+//        lighting_shader.set_mat4("model", trans3);
+//        glBindVertexArray(lineVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 2);

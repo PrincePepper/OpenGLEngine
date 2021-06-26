@@ -5,6 +5,9 @@
 #ifndef OPENGLENGINE_SPHEREOBJECT_H
 #define OPENGLENGINE_SPHEREOBJECT_H
 
+#include "LightSource.hpp"
+#include "../utils/LightningShaderFiller.hpp"
+
 void DrawGrid(float cx, float cz, float step) {
 
     float _cx = cx / 2;
@@ -27,46 +30,6 @@ void DrawGrid(float cx, float cz, float step) {
 
     }
 }
-
-void createTexture(unsigned int &temp_texture, const std::string &name_file) {
-    std::string str = name_file;
-    const char *temp_name_file = name_file.c_str();
-
-    glGenTextures(1, &temp_texture);
-    glBindTexture(GL_TEXTURE_2D, temp_texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int width, height, nr_channels;
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned char *data = stbi_load(temp_name_file, &width, &height, &nr_channels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load temp_texture" << std::endl;
-    }
-    stbi_image_free(data);
-}
-
-void initializeVBO_VAO(unsigned int &VAO, unsigned int &VBO, float object[]) { //нужно доделать
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(&object), &object, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-};
 
 void initgl() {
     glShadeModel(GL_SMOOTH);                    // shading mathod: GL_SMOOTH or GL_FLAT
@@ -127,6 +90,40 @@ createSphere(std::vector<glm::vec3> &vertices, std::vector<unsigned int> &indice
     }
 }
 
+
+void addLight(Shader name_shader, const Camera &camera, LightSource::light_caster_type type) {
+    name_shader.use();
+    LightSource light(type);
+    if (type == LightSource::DIRECTIONAL) {
+        light.get_light_source()
+                ->set_direction({-0.2f, -1.0f, -0.3f})
+                ->set_ambient({0.05f, 0.05f, 0.05f})
+                ->set_diffuse({0.5f, 0.5f, 0.5f})
+                ->set_specular({0.5f, 0.5f, 0.5f});
+    } else if (type == LightSource::POINT) {
+        light.get_light_source()
+                ->set_position(camera.get_camera_position())
+                ->set_ambient({0.2f, 0.2f, 0.2f})
+                ->set_diffuse({1.0f, 1.0f, 1.0f})
+                ->set_specular({1.0f, 1.0f, 1.0f})
+                ->set_constant(1.0f)
+                ->set_linear(0.09f)
+                ->set_quadratic(0.032f);
+    } else {
+        light.get_light_source()
+                ->set_position(camera.get_camera_position())
+                ->set_direction(camera.get_camera_front())
+                ->set_cut_off(glm::cos(glm::radians(15.0f)))
+                ->set_outer_cut_off(glm::cos(glm::radians(23.0f)))
+                ->set_ambient({0.1f, 0.1f, 0.1f})
+                ->set_diffuse({0.8f, 0.8f, 0.8f})
+                ->set_specular({1.0f, 1.0f, 1.0f})
+                ->set_constant(1.0f)
+                ->set_linear(0.09f)
+                ->set_quadratic(0.032f);
+    }
+    LightningShaderFiller::fill_light_shader(name_shader, light);
+}
 
 [[maybe_unused]] float lines[] = {
         0.0f, 0.0f, 0.0f,
