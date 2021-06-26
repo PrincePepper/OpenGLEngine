@@ -59,11 +59,13 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(light_cube), light_cube, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
     // texture coord attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------------------------------------------------------------------------
@@ -71,10 +73,10 @@ int main() {
     glBindVertexArray(lightCubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
     // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
     glEnableVertexAttribArray(1);
     ///---------------------------------------------------------------------------------------------
 
@@ -210,6 +212,31 @@ int main() {
         lighting_shader.set_mat4("model", trans3);
         glBindVertexArray(lineVAO);
         glDrawArrays(GL_TRIANGLES, 0, 2);
+
+        Vector3<float> cubePositions[] = {
+                Vector3<float>(0.0f, 0.0f, 0.0f),
+                Vector3<float>(2.0f, 5.0f, -15.0f),
+                Vector3<float>(-1.5f, -2.2f, -2.5f),
+                Vector3<float>(-3.8f, -2.0f, -12.3f),
+                Vector3<float>(2.4f, -0.4f, -3.5f),
+                Vector3<float>(-1.7f, 3.0f, -7.5f),
+                Vector3<float>(1.3f, -2.0f, -2.5f),
+                Vector3<float>(1.5f, 2.0f, -2.5f),
+                Vector3<float>(1.5f, 0.2f, -1.5f),
+                Vector3<float>(-1.3f, 1.0f, -1.5f)
+        };
+
+        //Other object
+        glBindVertexArray(cubeVAO);
+        for (unsigned int i = 0; i < 10; i++) {
+            Matrix4 transs = transform(cubePositions[i]);
+            float angle = 20.0f * i;
+            transs =
+                    transs * rotate(glm::radians(angle) * 1.0f, glm::radians(angle) * 0.3f, glm::radians(angle) * 0.5f);
+            lighting_shader.set_mat4("model", transs);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE);
