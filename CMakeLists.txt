@@ -15,7 +15,7 @@ add_executable(TestProjectLibs main_glew_sfml.cpp
         libs_project/Vector.hpp libs_project/Matrix.hpp
         utils/Shader.hpp utils/shaderLoader.hpp utils/shaderLoader.cpp utils/LightningShaderFiller.hpp
         libs_project/Objects.hpp libs_project/Sphere.cpp libs_project/Sphere.h libs_project/LightSource.hpp
-        libs_project/Texture.hpp libs_project/Material.hpp)
+        libs_project/Texture.hpp libs_project/Material.hpp libs_project/VBOObject.hpp libs_project/VAOObject.hpp)
 add_executable(TestVectorLib test_debug_project/tests_vector.cpp libs_project/Vector.hpp)
 add_executable(TestMatrixLib test_debug_project/tests_matrix.cpp libs_project/Matrix.hpp)
 #------------------------------------------------------------------------------

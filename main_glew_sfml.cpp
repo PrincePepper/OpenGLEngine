@@ -15,9 +15,9 @@
 #include "utils/Shader.hpp"
 #include "libs_project/Objects.hpp"
 #include "libs_project/Texture.hpp"
-#include "libs_project/Material.hpp"
-#include "libs_project/LightSource.hpp"
 #include "utils/LightningShaderFiller.hpp"
+#include "libs_project/VAOObject.hpp"
+#include "libs_project/VBOObject.hpp"
 
 using namespace std;
 
@@ -56,90 +56,42 @@ int main() {
     std::string s8 = "../res/shaders/defShader.fs";
     Shader light_cube_shader(s7, s8);
 
+    std::string s9 = "../res/shaders/lighting.vs";
+    std::string s10 = "../res/shaders/lighting.fs";
+    Shader light(s9, s10);
+
     Vector3<float> lightPos{1.3f, 1.3f, 1.3f};
     vector<Camera> camera(2);
     int inj = 0;
 
-    unsigned int VBO, EBO, cubeVAO, tetraVAO, squareVAO, sphereVAO, lineVAO, lightCubeVAO;
+
     ///---------------------------------------------------------------------------------------------
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &VBO);
+    myVAO cubeVAO;
+    myVBO VBO(light_cube, sizeof(light_cube));
+    myVAO::link_vertex_attr(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
+    myVAO::link_vertex_attr(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+    myVAO::link_vertex_attr(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
 
-    glBindVertexArray(cubeVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(light_cube), light_cube, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------------------------------------------------------------------------
-    glGenVertexArrays(1, &lightCubeVAO);
-    glBindVertexArray(lightCubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
+    myVAO lightCubeVAO;
+    myVAO::link_vertex_attr(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
+    VBO.bind();
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------------------------------------------------------------------------
-    glGenVertexArrays(1, &tetraVAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(tetraVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tetra), tetra, GL_STATIC_DRAW);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    myVAO tetraVAO;
+    myVAO::link_vertex_attr(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    myVAO::link_vertex_attr(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    VBO.bind();
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------------------------------------------------------------------------
-    glGenVertexArrays(1, &squareVAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(squareVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    ///---------------------------------------------------------------------------------------------
-
-    ///---------------------------------------------------------------------------------------------
-    glGenVertexArrays(1, &lineVAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(lineVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lines), lines, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    myVAO squareVAO;
+    myVAO::link_vertex_attr(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    myVAO::link_vertex_attr(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    VBO.bind();
     ///---------------------------------------------------------------------------------------------
 
     ///---------------------------Добавление текстур-----------------------------------------------
@@ -217,7 +169,7 @@ int main() {
         };
 
         //Other object
-        glBindVertexArray(cubeVAO);
+        cubeVAO.bind();
         for (unsigned int i = 0; i < 10; i++) {
             Matrix4 transs = transform(cubePositions[i]);
             float angle = 20.0f * i;
@@ -228,26 +180,20 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-//        light_cube_shader.use();
-//        light_cube_shader.set_mat4("projection", projection);
-//        light_cube_shader.set_mat4("view", view);
-//        model = transform(lightPos);
-//
-//        light_cube_shader.set_mat4("model", model);
-//        glBindVertexArray(lightCubeVAO);
-//        glDrawArrays(GL_TRIANGLES, 0, 36);
+        light_cube_shader.use();
+        light_cube_shader.set_mat4("projection", projection);
+        light_cube_shader.set_mat4("view", view);
+        model = transform(lightPos);
+
+        light_cube_shader.set_mat4("model", model);
+        lightCubeVAO.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         window.display();
     }
 
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightCubeVAO);
-
-    glDeleteVertexArrays(1, &tetraVAO);
-    glDeleteVertexArrays(1, &squareVAO);
-    glDeleteVertexArrays(1, &lineVAO);
-
-    glDeleteBuffers(1, &VBO);
+    cubeVAO.delete_array();
+    VBO.delete_buffer();
 
     window.close();
     return 0;
