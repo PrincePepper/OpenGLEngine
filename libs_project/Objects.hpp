@@ -96,7 +96,7 @@ void addLight(Shader name_shader, const Camera &camera, LightSource::light_caste
     LightSource light(type);
     if (type == LightSource::DIRECTIONAL) {
         light.get_light_source()
-                ->set_direction({-0.2f, -1.0f, -0.3f})
+                ->set_direction({-1.0f, -1.0f, -1.0f})
                 ->set_ambient({0.05f, 0.05f, 0.05f})
                 ->set_diffuse({0.5f, 0.5f, 0.5f})
                 ->set_specular({0.5f, 0.5f, 0.5f});

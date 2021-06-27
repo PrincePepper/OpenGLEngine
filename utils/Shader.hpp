@@ -6,6 +6,7 @@
 #include "../libs_project/Matrix.hpp"
 #include "../libs_project/Material.hpp"
 
+
 class Shader {
 public:
     Shader(std::string &vertex_path, std::string &fragment_path) {
@@ -16,17 +17,21 @@ public:
         glUseProgram(shader_id);
     }
 
-    void set_mat4(const GLchar *name, const Matrix4 &data) const {
+    void set_mat4(const std::string &name, const Matrix4 &data) const {
         std::vector<float> glm_matrix = matrix_to_glm(data);
-        glUniformMatrix4fv(glGetUniformLocation(shader_id, name), 1, GL_FALSE, &glm_matrix[0]);
+        glUniformMatrix4fv(glGetUniformLocation(shader_id, &name[0]), 1, GL_FALSE, &glm_matrix[0]);
     }
 
-    void set_vec3(const GLchar *name, const Vector3<float> &value) const {
+    void set_vec3(const std::string &name, const Vector3<float> &value) const {
         std::vector<float> aa;
         aa.push_back(value[0]);
         aa.push_back(value[1]);
         aa.push_back(value[2]);
-        glUniform3fv(glGetUniformLocation(shader_id, name), 1, &aa[0]);
+        glUniform3fv(glGetUniformLocation(shader_id, &name[0]), 1, &aa[0]);
+    }
+
+    void set_vec3(const std::string &name, float x, float y, float z) const {
+        glUniform3f(glGetUniformLocation(shader_id, &name[0]), x, y, z);
     }
 
     [[nodiscard]] GLuint get_shader_id() const {
@@ -41,13 +46,14 @@ public:
         glUniform1i(glGetUniformLocation(shader_id, &name[0]), value);
     }
 
-    void LoadLightShaders(int diffuse, int specular, float shininess) {
+    void LoadLightShaders(int diffuse, int specular, float shininess) const {
         this->use();
         Material material(diffuse, specular, shininess);
         this->set_int("material.diffuse", material.get_diffuse());
         this->set_int("material.specular", material.get_specular());
         this->set_float("material.shininess", material.get_shininess());
     }
+
 
 private:
     GLuint shader_id;

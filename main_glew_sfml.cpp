@@ -56,9 +56,9 @@ int main() {
     std::string s8 = "../res/shaders/defShader.fs";
     Shader light_cube_shader(s7, s8);
 
-    std::string s9 = "../res/shaders/lighting.vs";
-    std::string s10 = "../res/shaders/lighting.fs";
-    Shader light(s9, s10);
+    std::string s9 = "../res/shaders/CombinedLight.vs";
+    std::string s10 = "../res/shaders/CombinedLight.fs";
+    Shader CombinedLight(s9, s10);
 
     Vector3<float> lightPos{1.3f, 1.3f, 1.3f};
     vector<Camera> camera(2);
@@ -102,8 +102,22 @@ int main() {
     point.LoadLightShaders(0, 1, 32.0f);
     spot.LoadLightShaders(0, 1, 32.0f);
     directional.LoadLightShaders(0, 1, 32.0f);
+    CombinedLight.LoadLightShaders(0, 1, 32.0f);
 
     bool isGo = true;
+
+    Vector3<float> cubePositions[] = {
+            Vector3<float>(0.0f, 0.0f, 0.0f),
+            Vector3<float>(2.0f, 5.0f, -15.0f),
+            Vector3<float>(-1.5f, -2.2f, -2.5f),
+            Vector3<float>(-3.8f, -2.0f, -12.3f),
+            Vector3<float>(2.4f, -0.4f, -3.5f),
+            Vector3<float>(-1.7f, 3.0f, -7.5f),
+            Vector3<float>(1.3f, -2.0f, -2.5f),
+            Vector3<float>(1.5f, 2.0f, -2.5f),
+            Vector3<float>(1.5f, 0.2f, -1.5f),
+            Vector3<float>(-1.3f, 1.0f, -1.5f)
+    };
 
     while (isGo) {
         sf::Event window_event{};
@@ -138,9 +152,13 @@ int main() {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tex);
 
-//        addLight(directional, camera[inj], LightSource::DIRECTIONAL);
-//        addLight(point, camera[inj], LightSource::POINT);
-        addLight(spot, camera[inj], LightSource::SPOT);
+        CombinedLight.use();
+
+        LightningShaderFiller::fill_default_values(CombinedLight, 4);
+
+        addLight(CombinedLight, camera[inj], LightSource::DIRECTIONAL);
+
+        addLight(CombinedLight, camera[inj], LightSource::SPOT);
 
         Matrix4 model = Matrix4::identity_matrix();
         Matrix4 view(camera[inj].get_view_matrix());
@@ -151,43 +169,31 @@ int main() {
             projection = camera[inj].get_projection_matrix_perspective();
         }
 
-        spot.set_mat4("projection", projection);
-        spot.set_mat4("view", view);
-        spot.set_mat4("model", model);
+        CombinedLight.set_mat4("projection", projection);
+        CombinedLight.set_mat4("view", view);
+        CombinedLight.set_mat4("model", model);
 
-        Vector3<float> cubePositions[] = {
-                Vector3<float>(0.0f, 0.0f, 0.0f),
-                Vector3<float>(2.0f, 5.0f, -15.0f),
-                Vector3<float>(-1.5f, -2.2f, -2.5f),
-                Vector3<float>(-3.8f, -2.0f, -12.3f),
-                Vector3<float>(2.4f, -0.4f, -3.5f),
-                Vector3<float>(-1.7f, 3.0f, -7.5f),
-                Vector3<float>(1.3f, -2.0f, -2.5f),
-                Vector3<float>(1.5f, 2.0f, -2.5f),
-                Vector3<float>(1.5f, 0.2f, -1.5f),
-                Vector3<float>(-1.3f, 1.0f, -1.5f)
-        };
-
-        //Other object
         cubeVAO.bind();
         for (unsigned int i = 0; i < 10; i++) {
             Matrix4 transs = transform(cubePositions[i]);
             float angle = 20.0f * i;
             transs = transs * rotate(glm::radians(angle) * 1.0f, glm::radians(angle) * 0.3f,
                                      glm::radians(angle) * 0.5f);
-            spot.set_mat4("model", transs);
+            CombinedLight.set_mat4("model", transs);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        light_cube_shader.use();
-        light_cube_shader.set_mat4("projection", projection);
-        light_cube_shader.set_mat4("view", view);
-        model = transform(lightPos);
-
-        light_cube_shader.set_mat4("model", model);
-        lightCubeVAO.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        light_cube_shader.use();
+//        light_cube_shader.set_mat4("projection", projection);
+//        light_cube_shader.set_mat4("view", view);
+//
+//        for (const auto &point_light_position : point_light_positions) {
+//            Matrix4 transs = transform(point_light_position);
+//
+//            light_cube_shader.set_mat4("model", transs);
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+//        }
 
         window.display();
     }
@@ -217,9 +223,3 @@ int main() {
 //        lighting_shader.set_mat4("model", trans2);
 //        glBindVertexArray(squareVAO);
 //        glDrawArrays(GL_TRIANGLES, 0, 6);
-//
-//        // four object
-//        Matrix4 trans3 = transform(Vector3<float>(0, -1.0, 0));
-//        lighting_shader.set_mat4("model", trans3);
-//        glBindVertexArray(lineVAO);
-//        glDrawArrays(GL_TRIANGLES, 0, 2);
