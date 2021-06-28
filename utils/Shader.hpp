@@ -54,6 +54,13 @@ public:
         this->set_float("material.shininess", material.get_shininess());
     }
 
+    void LoadParallaxShaders(int diffuse, int normal, int depth) const {
+        this->use();
+        this->set_int("diffuseMap", diffuse);
+        this->set_int("normalMap", normal);
+        this->set_int("depthMap", depth);
+    }
+
 
 private:
     GLuint shader_id;
